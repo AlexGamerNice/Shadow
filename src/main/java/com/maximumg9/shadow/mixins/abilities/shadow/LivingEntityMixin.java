@@ -35,10 +35,10 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Shadow @NotNull public abstract ItemStack getWeaponStack();
 
-    @Inject(method = "disablesShield",at=@At("HEAD"), cancellable = true)
-    public void disablesShield(CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "getWeaponDisableBlockingForSeconds",at=@At("HEAD"), cancellable = true)
+    public void disablesShield(CallbackInfoReturnable<Float> cir) {
         if(this.getWeaponStack().getItem() instanceof TridentItem) {
-            cir.setReturnValue(true);
+            cir.setReturnValue(5.0F);
         }
     }
 
