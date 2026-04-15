@@ -141,7 +141,7 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ShadowSc
 
         @Override
         public @Nullable ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-            return new DecisionScreenHandler<>(syncId, this.resultCallback, values, playerInventory, ScreenHandlerContext.create(player.getWorld(), player.getBlockPos()), autoClose);
+            return new DecisionScreenHandler<>(syncId, this.resultCallback, values, playerInventory, ScreenHandlerContext.create(player.getEntityWorld(), player.getBlockPos()), autoClose);
         }
 
     }

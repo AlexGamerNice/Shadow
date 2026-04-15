@@ -47,27 +47,27 @@ public class Config implements Saveable {
 
     @Override
     public void readNBT(NbtCompound nbt) throws IllegalSaveException {
-        this.worldBorderSize = nbt.getInt("worldBorderSize");
-        this.roleSlotCount = nbt.getInt("roleSlotCount");
-        this.overworldEyes = nbt.getInt("overworldEyes");
-        this.netherEyes = nbt.getInt("netherEyes");
-        this.netherRoofEyes = nbt.getInt("netherRoofEyes");
-        this.food = Food.valueOf(nbt.getString("food"));
-        this.foodAmount = nbt.getInt("foodAmount");
-        this.additionalTimePerTickDuringNight = nbt.getDouble("additionalTimePerTickDuringNight");
-        this.debug = nbt.getBoolean("debug");
-        this.chatMessageCooldown = nbt.getInt("chatMessageCooldown");
-        this.cullRadius = nbt.getDouble("cullRadius");
-        this.fearRadius = nbt.getDouble("fearRadius");
-        this.markRadius = nbt.getDouble("markRadius");
-        this.disableChat = nbt.getBoolean("disableChat");
-        this.pinataHittable = nbt.getBoolean("pinataHittable");
-        this.disconnectTime = nbt.getInt("disconnectTime");
-        this.gracePeriodTicks = nbt.getInt("gracePeriodTicks");
+        this.worldBorderSize = nbt.getInt("worldBorderSize", this.worldBorderSize);
+        this.roleSlotCount = nbt.getInt("roleSlotCount", this.roleSlotCount);
+        this.overworldEyes = nbt.getInt("overworldEyes", this.overworldEyes);
+        this.netherEyes = nbt.getInt("netherEyes", this.netherEyes);
+        this.netherRoofEyes = nbt.getInt("netherRoofEyes", this.netherRoofEyes);
+        this.food = Food.valueOf(nbt.getString("food", this.food.name()));
+        this.foodAmount = nbt.getInt("foodAmount", this.foodAmount);
+        this.additionalTimePerTickDuringNight = nbt.getDouble("additionalTimePerTickDuringNight", this.additionalTimePerTickDuringNight);
+        this.debug = nbt.getBoolean("debug", this.debug);
+        this.chatMessageCooldown = nbt.getInt("chatMessageCooldown", this.chatMessageCooldown);
+        this.cullRadius = nbt.getDouble("cullRadius", this.cullRadius);
+        this.fearRadius = nbt.getDouble("fearRadius", this.fearRadius);
+        this.markRadius = nbt.getDouble("markRadius", this.markRadius);
+        this.disableChat = nbt.getBoolean("disableChat", this.disableChat);
+        this.pinataHittable = nbt.getBoolean("pinataHittable", this.pinataHittable);
+        this.disconnectTime = nbt.getInt("disconnectTime", this.disconnectTime);
+        this.gracePeriodTicks = nbt.getInt("gracePeriodTicks", this.gracePeriodTicks);
         
-        this.maxCooldownManager.readNBT(nbt.getCompound("maxCooldownManager"));
-        this.roleManager.readNBT(nbt.getCompound("roleManager"));
-        this.modifierManager.readNBT(nbt.getCompound("modifierManager"));
+        this.maxCooldownManager.readNBT(nbt.getCompoundOrEmpty("maxCooldownManager"));
+        this.roleManager.readNBT(nbt.getCompoundOrEmpty("roleManager"));
+        this.modifierManager.readNBT(nbt.getCompoundOrEmpty("modifierManager"));
     }
 
     @Override

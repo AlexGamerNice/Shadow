@@ -24,7 +24,7 @@ public class DragonDeathMixin extends MobEntity {
     
     @Override
     public void onDeath(DamageSource damageSource) {
-        Shadow shadow = getShadow(Objects.requireNonNull(this.getServer()));
+        Shadow shadow = getShadow(Objects.requireNonNull(this.getEntityWorld().getServer()));
 
         final Predicate<IndirectPlayer> V_VICTOR_CONDITION =
             (player) ->

@@ -1,5 +1,6 @@
 package com.maximumg9.shadow.abilities;
 
+import com.maximumg9.shadow.util.ItemComponents;
 import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.NBTUtil;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
@@ -11,8 +12,6 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Unit;
-
 public class PoseidonsTrident extends Ability {
     public static final Identifier ID = MiscUtil.shadowID("poseidons_trident");
     private static final ItemStack ITEM_STACK;
@@ -42,8 +41,8 @@ public class PoseidonsTrident extends Ability {
             Text.literal("Poseidon's Trident").styled(style -> style.withColor(Formatting.BLUE))
         );
         ITEM_STACK.set(
-            DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP,
-            Unit.INSTANCE
+            DataComponentTypes.TOOLTIP_DISPLAY,
+            ItemComponents.HIDE_ADDITIONAL_TOOLTIP
         );
         NBTUtil.removeAttributeModifiers(ITEM_STACK);
     }
@@ -101,7 +100,7 @@ public class PoseidonsTrident extends Ability {
         player.scheduleUntil(
             (player) ->
                 player.getInventory()
-                    .remove((item) -> player.getUuid().equals(NBTUtil.getCustomData(item).getUuid("owner")),
+                    .remove((item) -> NBTUtil.getUuid(NBTUtil.getCustomData(item), "owner").filter(player.getUuid()::equals).isPresent(),
                         1,
                         player.playerScreenHandler.getCraftingInput()),
             CancelPredicates.cancelOnPhaseChange(player.getShadow().state.phase)

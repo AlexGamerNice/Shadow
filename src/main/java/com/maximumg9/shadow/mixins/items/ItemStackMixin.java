@@ -6,9 +6,9 @@ import com.maximumg9.shadow.util.NBTUtil;
 import net.minecraft.component.ComponentHolder;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -24,12 +24,12 @@ public abstract class ItemStackMixin implements ComponentHolder {
     }
     
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
-    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
+    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         Identifier id = NBTUtil.getID(c(this));
         ItemUseCallback callback = Shadow.ITEM_USE_CALLBACK_MAP.get(id);
         
         if (callback != null) {
-            TypedActionResult<ItemStack> result = callback.use(world, user, hand);
+            ActionResult result = callback.use(world, user, hand);
             if (result != null) {
                 cir.setReturnValue(result);
                 cir.cancel();

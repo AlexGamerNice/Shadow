@@ -5,6 +5,7 @@ import com.maximumg9.shadow.abilities.SheriffBow;
 import com.maximumg9.shadow.roles.RoleFactory;
 import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.roles.SubFaction;
+import com.maximumg9.shadow.util.ItemComponents;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
@@ -12,7 +13,6 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Unit;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -30,8 +30,8 @@ public class Sheriff extends AbstractVillager {
             new Sheriff(null).getName()
         );
         ITEM_STACK.set(
-            DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP,
-            Unit.INSTANCE
+            DataComponentTypes.TOOLTIP_DISPLAY,
+            ItemComponents.HIDE_ADDITIONAL_TOOLTIP
         );
     }
     

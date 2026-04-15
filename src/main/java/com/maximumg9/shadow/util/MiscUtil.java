@@ -70,6 +70,6 @@ public abstract class MiscUtil {
         return item;
     }
     public static RegistryEntry<DamageType> getDamageType(MinecraftServer server, RegistryKey<DamageType> damageType) {
-        return server.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(damageType);
+        return server.getRegistryManager().getOrThrow(RegistryKeys.DAMAGE_TYPE).getOrThrow(damageType);
     }
 }

@@ -30,7 +30,7 @@ public class EntityTrackerEntryMixin {
     
     @ModifyArg(method = "sendPackets", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/s2c/play/EntityTrackerUpdateS2CPacket;<init>(ILjava/util/List;)V"))
     public List<DataTracker.SerializedEntry<?>> newEntityTrackerPacket(List<DataTracker.SerializedEntry<?>> changedEntries, @Local(argsOnly = true) ServerPlayerEntity player) {
-        Shadow shadow = getShadow(player.getServer());
+        Shadow shadow = getShadow(player.getEntityWorld().getServer());
         Set<IndirectPlayer> markedPlayers = new HashSet<>();
         // Reminder to future self: make glowing not be here
         

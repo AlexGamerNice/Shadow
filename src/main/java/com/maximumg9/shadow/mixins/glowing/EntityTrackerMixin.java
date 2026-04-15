@@ -9,7 +9,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.PlayPackets;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.server.network.PlayerAssociatedNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -38,18 +37,13 @@ public class EntityTrackerMixin {
         )
     )
     public void sendToOtherNearbyPlayers(PlayerAssociatedNetworkHandler instance, Packet<?> packet) {
-        if (packet.getPacketId() != PlayPackets.SET_ENTITY_DATA) {
-            instance.sendPacket(packet);
-            return;
-        }
-        Shadow shadow = getShadow(instance.getPlayer().getServer());
-        Set<IndirectPlayer> markedPlayers = new HashSet<>();
-        IndirectPlayer player = shadow.getIndirect(instance.getPlayer());
-        
         if (!(packet instanceof EntityTrackerUpdateS2CPacket originalPacket)) {
             instance.sendPacket(packet);
             return;
         }
+        Shadow shadow = getShadow(instance.getPlayer().getEntityWorld().getServer());
+        Set<IndirectPlayer> markedPlayers = new HashSet<>();
+        IndirectPlayer player = shadow.getIndirect(instance.getPlayer());
         
         if (shadow.isNight() && this.entity.getType() == EntityType.PLAYER) {
             shadow.getAllLivingPlayers()

@@ -16,9 +16,9 @@ import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,7 +31,7 @@ public class AbilityStar implements ItemUseCallback {
     @Unique
     public static final Identifier ID = MiscUtil.shadowID("ability_star");
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    public ActionResult use(World world, PlayerEntity user, Hand hand) {
         if (!(world instanceof ServerWorld)) {
             return null;
         }
@@ -58,7 +58,7 @@ public class AbilityStar implements ItemUseCallback {
         ));
         
         
-        return TypedActionResult.success(stack, false);
+        return ActionResult.SUCCESS.noIncrementStat();
     }
 
     private static @NotNull ArrayList<ItemRepresentable> getAbilities(ServerPlayerEntity user, Role role, Shadow shadow) {

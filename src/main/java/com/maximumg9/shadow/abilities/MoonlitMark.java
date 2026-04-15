@@ -169,7 +169,7 @@ public class MoonlitMark extends Ability {
 
         double maxDistance = this.player.getShadow().config.markRadius;
         double targetDistance = maxDistance;
-        for (ServerPlayerEntity serverPlayerEntity : p.getServerWorld().getPlayers(
+        for (ServerPlayerEntity serverPlayerEntity : p.getEntityWorld().getPlayers(
             (player) -> {
                 IndirectPlayer indirect = getShadow().getIndirect(player);
                 return player.squaredDistanceTo(p) <= maxDistance * maxDistance

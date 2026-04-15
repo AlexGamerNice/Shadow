@@ -57,7 +57,7 @@ public class PinataGift extends Ability {
         final List<IndirectPlayer> SHADOWS = new ArrayList<>(PLAYERS.stream().filter((p) -> p.role.getFaction() == Faction.SHADOW).toList());
         final List<IndirectPlayer> VILLAGERS = new ArrayList<>(PLAYERS.stream().filter((p) -> p.role.getFaction() == Faction.VILLAGER).toList());
 
-        EntityAttributeInstance instance = attacker.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+        EntityAttributeInstance instance = attacker.getAttributeInstance(EntityAttributes.MAX_HEALTH);
         if (instance == null) return;
 
         EntityAttributeModifier healthModifier = instance.getModifier(HP_ATTR_ID);
@@ -71,7 +71,7 @@ public class PinataGift extends Ability {
             );
         } else {
             if (healthModifier.operation() != EntityAttributeModifier.Operation.ADD_VALUE) {
-                MiscUtil.getShadow(attacker.server).ERROR("Pinata Operation isn't ADD_VALUE (how did you MANAGE this)");
+                MiscUtil.getShadow(attacker.getEntityWorld().getServer()).ERROR("Pinata Operation isn't ADD_VALUE (how did you MANAGE this)");
                 return;
             }
             instance.overwritePersistentModifier(
@@ -94,7 +94,7 @@ public class PinataGift extends Ability {
         else giftedPlayers = List.of(randomVillager, randomShadow);
 
 
-        attacker.server.getPlayerManager().getPlayerList().forEach((player) -> {
+        attacker.getEntityWorld().getServer().getPlayerManager().getPlayerList().forEach((player) -> {
             player.sendMessage(
                 TextUtil.withColour("The Piñata has gifted that one of ", Formatting.DARK_AQUA)
                     .append(giftedPlayers.getFirst().getName())

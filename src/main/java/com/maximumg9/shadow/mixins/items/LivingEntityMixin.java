@@ -32,13 +32,13 @@ public abstract class LivingEntityMixin extends Entity {
         if(cir.getReturnValue() == null) return;
         cir.getReturnValue().entrySet().removeIf((entry) -> {
             ItemStack stack = entry.getValue();
-            return NBTUtil.getCustomData(stack).getBoolean(NBTUtil.INVISIBLE_KEY);
+            return NBTUtil.getCustomData(stack).getBoolean(NBTUtil.INVISIBLE_KEY).orElse(false);
         });
     }
 
     @Redirect(method = "getEquipmentChanges",at= @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isEmpty()Z",ordinal = 1))
     public boolean dontUpdateAttributeModifiers(ItemStack oldStack) {
-        return oldStack.isEmpty() || NBTUtil.getCustomData(oldStack).getBoolean(NBTUtil.DISABLE_ATTRIBUTES_KEY);
+        return oldStack.isEmpty() || NBTUtil.getCustomData(oldStack).getBoolean(NBTUtil.DISABLE_ATTRIBUTES_KEY).orElse(false);
     }
 
 }

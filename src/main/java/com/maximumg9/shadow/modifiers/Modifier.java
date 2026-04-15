@@ -18,7 +18,7 @@ public abstract class Modifier implements ItemRepresentable, Saveable {
     }
     
     public static Modifier load(NbtCompound nbt, IndirectPlayer player) {
-        String modifierName = nbt.getString("name");
+        String modifierName = nbt.getString("name", "");
         if (Objects.equals(modifierName, "")) return null;
         Modifiers modifier = Modifiers.getModifier(modifierName);
         

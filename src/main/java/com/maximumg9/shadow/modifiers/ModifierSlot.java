@@ -36,14 +36,14 @@ public class ModifierSlot implements ItemRepresentable, Saveable {
     }
     
     public void readNBT(NbtCompound nbt) {
-        int index = nbt.getInt("index");
+        int index = nbt.getInt("index", this.index);
         
         if (index != this.index)
             throw new IllegalStateException("Indexes in saved modifier slots do not match (maybe they weren't saved correctly?)");
         
-        this.modifier = Modifiers.getModifier(nbt.getString("modifier"));
-        this.count = nbt.getInt("count");
-        this.chance = nbt.getFloat("chance");
+        this.modifier = Modifiers.getModifier(nbt.getString("modifier", this.modifier.name));
+        this.count = nbt.getInt("count", this.count);
+        this.chance = nbt.getFloat("chance", this.chance);
     }
     
     public NbtCompound writeNBT(NbtCompound nbt) {

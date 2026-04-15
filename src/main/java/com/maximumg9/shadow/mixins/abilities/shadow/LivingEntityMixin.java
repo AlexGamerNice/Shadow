@@ -35,10 +35,10 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Shadow @NotNull public abstract ItemStack getWeaponStack();
 
-    @Inject(method = "disablesShield",at=@At("HEAD"), cancellable = true)
-    public void disablesShield(CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "getWeaponDisableBlockingForSeconds",at=@At("HEAD"), cancellable = true)
+    public void disablesShield(CallbackInfoReturnable<Float> cir) {
         if(this.getWeaponStack().getItem() instanceof TridentItem) {
-            cir.setReturnValue(true);
+            cir.setReturnValue(5.0F);
         }
     }
 
@@ -58,13 +58,12 @@ public abstract class LivingEntityMixin extends Entity {
     @Unique
     private ItemStack handleTrident(EquipmentSlot slot, ItemStack trident) {
         if(slot == EquipmentSlot.MAINHAND) {
-            World world = this.getWorld();
+            World world = this.getEntityWorld();
             if(world instanceof ServerWorld sWorld) {
                 RegistryEntry<Enchantment> riptide = sWorld
                     .getRegistryManager()
-                    .get(RegistryKeys.ENCHANTMENT)
-                    .getEntry(Enchantments.RIPTIDE)
-                    .orElseThrow();
+                    .getOrThrow(RegistryKeys.ENCHANTMENT)
+                    .getOrThrow(Enchantments.RIPTIDE);
                 trident.apply(
                     DataComponentTypes.ENCHANTMENTS,
                     ItemEnchantmentsComponent.DEFAULT,
@@ -73,13 +72,12 @@ public abstract class LivingEntityMixin extends Entity {
                 );
             }
         } else if(slot == EquipmentSlot.OFFHAND) {
-            World world = this.getWorld();
+            World world = this.getEntityWorld();
             if(world instanceof ServerWorld sWorld) {
                 RegistryEntry<Enchantment> loyalty = sWorld
                     .getRegistryManager()
-                    .get(RegistryKeys.ENCHANTMENT)
-                    .getEntry(Enchantments.LOYALTY)
-                    .orElseThrow();
+                    .getOrThrow(RegistryKeys.ENCHANTMENT)
+                    .getOrThrow(Enchantments.LOYALTY);
                 trident.apply(
                     DataComponentTypes.ENCHANTMENTS,
                     ItemEnchantmentsComponent.DEFAULT,
@@ -88,7 +86,7 @@ public abstract class LivingEntityMixin extends Entity {
                 );
             }
         } else {
-            if(!this.getWorld().isClient) {
+            if (!this.getEntityWorld().isClient()) {
                 trident.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE,true);
             }
         }

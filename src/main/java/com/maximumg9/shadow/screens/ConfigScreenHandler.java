@@ -230,7 +230,7 @@ public class ConfigScreenHandler extends ShadowScreenHandler {
 
     public void onClosed(PlayerEntity player) {
         if (player instanceof ServerPlayerEntity sPlayer) {
-            Shadow shadow = getShadow(sPlayer.getServer());
+            Shadow shadow = getShadow(sPlayer.getEntityWorld().getServer());
             shadow.saveAsync();
         }
     }
@@ -257,7 +257,7 @@ public class ConfigScreenHandler extends ShadowScreenHandler {
             return new ConfigScreenHandler(
                 syncId,
                 playerInventory,
-                ScreenHandlerContext.create(player.getWorld(), player.getBlockPos()),
+                ScreenHandlerContext.create(player.getEntityWorld(), player.getBlockPos()),
                 this.config, this.editable
             );
         }

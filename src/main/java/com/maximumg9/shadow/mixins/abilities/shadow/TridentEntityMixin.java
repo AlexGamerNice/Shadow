@@ -27,9 +27,9 @@ public abstract class TridentEntityMixin {
     )
     public float tridentBreakShield(ServerWorld world, ItemStack stack, Entity target, DamageSource damageSource, float baseDamage) {
         if(NBTUtil.hasID(stack, PoseidonsTrident.ID)) {
-            if(target instanceof PlayerEntity p) {
-                if(p.isBlocking()) {
-                    p.disableShield();
+            if(target instanceof PlayerEntity p && p.getEntityWorld() instanceof ServerWorld serverWorld) {
+                if(p.isBlocking() && damageSource.getAttacker() instanceof LivingEntity attacker) {
+                    p.takeShieldHit(serverWorld, attacker);
                 }
             }
             float strengthAdditionalDamage = 0;

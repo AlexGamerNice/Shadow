@@ -6,6 +6,7 @@ import com.maximumg9.shadow.modifiers.ModifierSlot;
 import com.maximumg9.shadow.modifiers.Modifiers;
 import com.maximumg9.shadow.util.Delay;
 import com.maximumg9.shadow.util.MiscUtil;
+import com.maximumg9.shadow.util.ItemComponents;
 import com.maximumg9.shadow.util.TextUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,7 +24,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Unit;
 import org.jetbrains.annotations.NotNull;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
@@ -127,8 +127,8 @@ public class ModifierSlotScreenHandler extends ShadowScreenHandler {
             )
         );
         amountStack.set(
-            DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP,
-            Unit.INSTANCE
+            DataComponentTypes.TOOLTIP_DISPLAY,
+            ItemComponents.HIDE_ADDITIONAL_TOOLTIP
         );
         this.inventory.setStack(SIZE - 2, amountStack);
         
@@ -222,7 +222,7 @@ public class ModifierSlotScreenHandler extends ShadowScreenHandler {
     @Override
     public void onClosed(PlayerEntity player) {
         if (player instanceof ServerPlayerEntity sPlayer) {
-            Shadow shadow = getShadow(sPlayer.getServer());
+            Shadow shadow = getShadow(sPlayer.getEntityWorld().getServer());
             shadow.saveAsync();
             
             shadow.addTickable(Delay.instant(
@@ -253,7 +253,7 @@ public class ModifierSlotScreenHandler extends ShadowScreenHandler {
             return new ModifierSlotScreenHandler(
                 syncId, slot,
                 playerInventory,
-                ScreenHandlerContext.create(player.getWorld(), player.getBlockPos())
+                ScreenHandlerContext.create(player.getEntityWorld(), player.getBlockPos())
             );
         }
     }

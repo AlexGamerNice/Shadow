@@ -3,7 +3,6 @@ package com.maximumg9.shadow.config;
 import com.maximumg9.shadow.saving.Saveable;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
 
 public class MaxCooldownManager implements Saveable {
@@ -16,8 +15,7 @@ public class MaxCooldownManager implements Saveable {
         for (String key : nbt.getKeys()) {
             Identifier id = Identifier.tryParse(key);
             if (id == null) continue;
-            if (!nbt.contains(key, NbtElement.INT_TYPE)) continue;
-            cooldownMap.put(id, nbt.getLong(key));
+            nbt.getLong(key).ifPresent(value -> cooldownMap.put(id, value));
         }
     }
     

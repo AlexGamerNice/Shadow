@@ -21,7 +21,7 @@ public class RolesCommand {
                     
                     Shadow shadow = getShadow(src.getServer());
                     
-                    shadow.config.roleManager.showRoleListIndex(Objects.requireNonNull(src.getPlayer()), src.hasPermissionLevel(3));
+                    shadow.config.roleManager.showRoleListIndex(Objects.requireNonNull(src.getPlayer()), com.maximumg9.shadow.util.PermissionUtil.hasPermissionLevel(src, 3));
                     
                     ctx.getSource().sendFeedback(
                         () -> Text.literal("Opened Role Menu"),

@@ -12,6 +12,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -24,6 +25,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.rule.GameRules;
 import net.minecraft.world.dimension.DimensionType;
 
 public class StartTicker implements Tickable {
@@ -179,7 +181,7 @@ public class StartTicker implements Tickable {
         item.setInvulnerable(true);
         item.setNeverDespawn();
 
-        DisplayEntity.ItemDisplayEntity display = EntityType.ITEM_DISPLAY.create(world);
+        DisplayEntity.ItemDisplayEntity display = EntityType.ITEM_DISPLAY.create(world, SpawnReason.LOAD);
         assert display != null;
         display.getStackReference(0).set(new ItemStack(Items.ENDER_EYE));
         display.updatePosition(blockCenter.x, blockCenter.y, blockCenter.z);
@@ -206,7 +208,7 @@ public class StartTicker implements Tickable {
             this.shadow = shadow;
             if (shadow.config.gracePeriodTicks >= 0) {
                 ticksLeft = shadow.config.gracePeriodTicks;
-                shadow.getServer().setPvpEnabled(false);
+                shadow.getServer().getOverworld().getGameRules().setValue(GameRules.PVP, false, shadow.getServer());
                 for (IndirectPlayer player : this.shadow.getOnlinePlayers()) {
                     player.sendMessageNow(
                         Text.literal("There is a " + TimeUtil.ticksToText(shadow.config.gracePeriodTicks, true) + " grace period. All PVP and any killing-related abilities are disabled during this time!").styled(style -> style.withColor(Formatting.GREEN))
@@ -222,7 +224,7 @@ public class StartTicker implements Tickable {
         @Override
         public void onEnd() {
             if(shadow.state.phase != GamePhase.PLAYING) return;
-            shadow.getServer().setPvpEnabled(true);
+            shadow.getServer().getOverworld().getGameRules().setValue(GameRules.PVP, true, shadow.getServer());
             for (IndirectPlayer player : this.shadow.getOnlinePlayers()) {
                 player.sendMessageNow(
                     Text.literal("The grace period has ended!").styled(style -> style.withColor(Formatting.GOLD))

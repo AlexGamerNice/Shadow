@@ -11,8 +11,8 @@ import com.maximumg9.shadow.saving.Saveable;
 import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.Delay;
 import com.maximumg9.shadow.util.MiscUtil;
+import com.maximumg9.shadow.util.NBTUtil;
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.component.ComponentChanges;
@@ -26,7 +26,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.registry.Registries;
@@ -39,7 +38,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.UserCache;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,7 +68,7 @@ public class IndirectPlayer implements ItemRepresentable, Saveable {
     
     public IndirectPlayer(ServerPlayerEntity base) {
         this.playerUUID = base.getUuid();
-        this.server = base.server;
+        this.server = base.getEntityWorld().getServer();
         this.role = new Spectator(this);
         this.name = base.getName();
         this.extraStorage = new NbtCompound();
@@ -103,40 +101,33 @@ public class IndirectPlayer implements ItemRepresentable, Saveable {
     }
 
     static UUID getUUIDForData(NbtCompound nbt) {
-        return nbt.getUuid("playerUUID");
+        return NBTUtil.getUuid(nbt, "playerUUID").orElseThrow();
     }
 
     public void readNBT(NbtCompound nbt) {
-        this.frozen = nbt.getBoolean("frozen");
-        this.participating = nbt.getBoolean("participating");
+        this.frozen = nbt.getBoolean("frozen", false);
+        this.participating = nbt.getBoolean("participating", true);
         Role tempRole = null;
 
-        if (nbt.contains("role", NbtElement.COMPOUND_TYPE)) {
-            tempRole = Role.load(nbt.getCompound("role"), this);
+        if (nbt.getCompound("role").isPresent()) {
+            tempRole = Role.load(nbt.getCompound("role").get(), this);
         }
 
-        if (nbt.contains("original_role", NbtElement.COMPOUND_TYPE)) {
-            this.originalRole = Roles.getRole(nbt.getString("original_role"));
+        if (nbt.getString("original_role").isPresent()) {
+            this.originalRole = Roles.getRole(nbt.getString("original_role").get());
         } else {
             this.originalRole = null;
         }
 
-        if (nbt.contains("modifiers", NbtElement.LIST_TYPE)) {
-            for (int i = 0; i < nbt.getList("modifiers", NbtElement.COMPOUND_TYPE).size(); i++) {
-                this.modifiers.add(
-                    Modifier.load(
-                        nbt.getList(
-                            "modifiers",
-                            NbtElement.COMPOUND_TYPE
-                        ).getCompound(i),
-                        this
-                    )
-                );
-            }
+        NbtList modifierList = nbt.getListOrEmpty("modifiers");
+        for (int i = 0; i < modifierList.size(); i++) {
+            modifierList.getCompound(i).ifPresent(
+                compound -> this.modifiers.add(Modifier.load(compound, this))
+            );
         }
 
-        this.offlineTicks = nbt.getInt("offline_ticks");
-        this.extraStorage = nbt.getCompound("extra_storage");
+        this.offlineTicks = nbt.getInt("offline_ticks", 0);
+        this.extraStorage = nbt.getCompoundOrEmpty("extra_storage");
 
         if(tempRole != null) {
             this.role = tempRole;
@@ -151,7 +142,7 @@ public class IndirectPlayer implements ItemRepresentable, Saveable {
     }
 
     public NbtCompound writeNBT(NbtCompound nbt) {
-        nbt.putUuid("playerUUID", this.playerUUID);
+        NBTUtil.putUuid(nbt, "playerUUID", this.playerUUID);
         nbt.putBoolean("frozen", this.frozen);
         nbt.putBoolean("participating", this.participating);
 
@@ -188,24 +179,16 @@ public class IndirectPlayer implements ItemRepresentable, Saveable {
     public Text getName() {
         this.getPlayer().ifPresent((psPlayer) -> this.name = psPlayer.getName());
         if (name == null) {
-            UserCache cache = this.server.getUserCache();
-            if (cache != null) {
-                Optional<GameProfile> profile = cache.getByUuid(this.playerUUID);
-                this.name = profile.map(
-                    gameProfile -> Text.literal(
-                        gameProfile.getName()
-                    )
-                ).orElse(
-                    Text.literal(
-                        playerUUID.toString()
-                    )
-                );
-            } else {
-                this.name = Text.literal(
+            Optional<GameProfile> profile = this.server.getApiServices().profileResolver().getProfileById(this.playerUUID);
+            this.name = profile.map(
+                gameProfile -> Text.literal(
+                    gameProfile.name()
+                )
+            ).orElseGet(
+                () -> Text.literal(
                     playerUUID.toString()
-                );
-            }
-            
+                )
+            );
         }
         return this.name;
     }
@@ -221,7 +204,7 @@ public class IndirectPlayer implements ItemRepresentable, Saveable {
     
     public void damage(DamageSource source, float amount, Predicate<IndirectPlayer> cancelPredicate) {
         scheduleUntil(
-            (player) -> player.damage(source, amount),
+            (player) -> player.damage(player.getEntityWorld(), source, amount),
             cancelPredicate
         );
     }
@@ -234,8 +217,8 @@ public class IndirectPlayer implements ItemRepresentable, Saveable {
     }
     
     public void damageNow(DamageSource source, float amount) {
-        this.getPlayerOrThrow()
-            .damage(source, amount);
+        ServerPlayerEntity player = this.getPlayerOrThrow();
+        player.damage(player.getEntityWorld(), source, amount);
     }
     
     public void giveEffect(StatusEffectInstance effect, Predicate<IndirectPlayer> cancelPredicate) {
@@ -360,7 +343,7 @@ public class IndirectPlayer implements ItemRepresentable, Saveable {
                     player,
                     volume,
                     pitch,
-                    player.getServerWorld().random.nextLong()
+                    player.getEntityWorld().getRandom().nextLong()
                 )
             );
     }
@@ -374,7 +357,7 @@ public class IndirectPlayer implements ItemRepresentable, Saveable {
                     player,
                     volume,
                     pitch,
-                    player.getServerWorld().random.nextLong()
+                    player.getEntityWorld().getRandom().nextLong()
                 )
             )
             , cancelCondition);
@@ -460,11 +443,7 @@ public class IndirectPlayer implements ItemRepresentable, Saveable {
         );
         builder.add(
             DataComponentTypes.PROFILE,
-            new ProfileComponent(
-                Optional.empty(),
-                Optional.of(this.playerUUID),
-                new PropertyMap()
-            )
+            ProfileComponent.ofDynamic(this.playerUUID)
         );
         
         return new ItemStack(
@@ -479,7 +458,7 @@ public class IndirectPlayer implements ItemRepresentable, Saveable {
                 for (
                     AdvancementEntry advancement
                     :
-                    Objects.requireNonNull(player.getServer())
+                    Objects.requireNonNull(player.getEntityWorld().getServer())
                         .getAdvancementLoader()
                         .getAdvancements()
                 ) {

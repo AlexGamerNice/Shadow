@@ -3,6 +3,7 @@ package com.maximumg9.shadow.mixins.mechanics;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.roles.Faction;
+import com.maximumg9.shadow.util.PermissionUtil;
 import com.maximumg9.shadow.util.TextUtil;
 import com.maximumg9.shadow.util.TimeUtil;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
@@ -49,7 +50,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         Shadow shadow = getShadow(this.player.server);
         
         if (!shadow.getIndirect(this.player).frozen) return;
-        if (this.player.hasPermissionLevel(3) && (this.player.isInCreativeMode() || this.player.isSpectator())) return;
+        if (PermissionUtil.hasPermissionLevel(this.player, 3) && (this.player.isInCreativeMode() || this.player.isSpectator())) return;
         
         double x = clampHorizontal(packet.getX(this.player.getX()));
         double y = clampVertical(packet.getY(this.player.getY()));
@@ -89,7 +90,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         if (shadow.config.disableChat) ci.cancel();
         
         IndirectPlayer p = shadow.getIndirect(this.player);
-        if (p.role.getFaction() == Faction.SPECTATOR && !this.player.hasPermissionLevel(3)) {
+        if (p.role.getFaction() == Faction.SPECTATOR && !PermissionUtil.hasPermissionLevel(this.player, 3)) {
             p.sendMessageNow(
                 TextUtil.withColour("You are a spectator so you cannot chat", Formatting.YELLOW)
             );

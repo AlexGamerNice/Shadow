@@ -86,7 +86,7 @@ public class Cull extends Ability {
     public AbilityResult apply() {
         ServerPlayerEntity p = this.player.getPlayerOrThrow();
         
-        List<ServerPlayerEntity> realTargets = p.getServerWorld().getPlayers(
+        List<ServerPlayerEntity> realTargets = p.getEntityWorld().getPlayers(
             (player) -> {
                 IndirectPlayer indirect = getShadow().getIndirect(player);
                 return player.squaredDistanceTo(p) <= this.player.getShadow().config.cullRadius * this.player.getShadow().config.cullRadius &&
@@ -101,7 +101,7 @@ public class Cull extends Ability {
             return AbilityResult.CLOSE;
         }
         
-        List<ServerPlayerEntity> fakeTargets = p.getServerWorld().getPlayers(
+        List<ServerPlayerEntity> fakeTargets = p.getEntityWorld().getPlayers(
             (player) -> {
                 IndirectPlayer indirect = getShadow().getIndirect(player);
                 return player.squaredDistanceTo(p) <= this.player.getShadow().config.cullRadius * this.player.getShadow().config.cullRadius &&
@@ -113,7 +113,8 @@ public class Cull extends Ability {
         
         realTargets.forEach((player) ->
             player.damage(
-                p.getServerWorld()
+                p.getEntityWorld(),
+                p.getEntityWorld()
                     .getDamageSources()
                     .magic(),
                 Math.min(damage, player.getHealth() - 1.0f)
@@ -122,7 +123,8 @@ public class Cull extends Ability {
         
         fakeTargets.forEach((player) ->
             player.damage(
-                p.getServerWorld()
+                p.getEntityWorld(),
+                p.getEntityWorld()
                     .getDamageSources()
                     .magic(),
                 0.001f

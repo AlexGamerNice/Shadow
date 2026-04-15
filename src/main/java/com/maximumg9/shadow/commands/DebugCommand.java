@@ -40,7 +40,7 @@ public class DebugCommand {
             literal("$debug")
                 .then(
                     literal("setRole")
-                        .requires((source) -> source.hasPermissionLevel(3))
+                        .requires((source) -> com.maximumg9.shadow.util.PermissionUtil.hasPermissionLevel(source, 3))
                         .then(
                             argument("player", player())
                                 .then(
@@ -83,7 +83,7 @@ public class DebugCommand {
                 )
                 .then(
                     literal("setPhase")
-                        .requires((source) -> source.hasPermissionLevel(3))
+                        .requires((source) -> com.maximumg9.shadow.util.PermissionUtil.hasPermissionLevel(source, 3))
                         .then(
                             argument("phase", string())
                                 .suggests(GamePhase::suggest)
@@ -102,7 +102,7 @@ public class DebugCommand {
                 )
                 .then(
                     literal("sampleHeightmap")
-                        .requires((source) -> source.hasPermissionLevel(3))
+                        .requires((source) -> com.maximumg9.shadow.util.PermissionUtil.hasPermissionLevel(source, 3))
                         .executes((ctx) -> {
                             BlockPos position = BlockPos.ofFloored(ctx.getSource().getPosition());
                             
@@ -119,7 +119,7 @@ public class DebugCommand {
                 .then(
                     literal("currentRoles")
                         .requires((source) -> {
-                            if (source.hasPermissionLevel(3)) {
+                            if (com.maximumg9.shadow.util.PermissionUtil.hasPermissionLevel(source, 3)) {
                                 return true;
                             }
                             IndirectPlayer player = getShadow(source.getServer()).getIndirect(source.getPlayer());
@@ -149,7 +149,7 @@ public class DebugCommand {
                 )
                 .then(
                     literal("eyes")
-                        .requires((source) -> source.hasPermissionLevel(3))
+                        .requires((source) -> com.maximumg9.shadow.util.PermissionUtil.hasPermissionLevel(source, 3))
                         .executes((ctx) -> {
                             StringBuilder text = new StringBuilder("Eyes: ");
                             for (Eye eye : getShadow(ctx.getSource().getServer()).state.eyes) {
@@ -163,7 +163,7 @@ public class DebugCommand {
                 )
                 .then(
                     literal("getData")
-                        .requires((source) -> source.hasPermissionLevel(3))
+                        .requires((source) -> com.maximumg9.shadow.util.PermissionUtil.hasPermissionLevel(source, 3))
                         .executes((ctx) -> {
                             Entity entity = ctx.getSource().getEntity();
                             if(!(entity instanceof LivingEntity lEntity)) {
@@ -180,7 +180,7 @@ public class DebugCommand {
                     literal("setData")
                         .then(
                             argument("data", nbtCompound())
-                                .requires((source) -> source.hasPermissionLevel(3))
+                                .requires((source) -> com.maximumg9.shadow.util.PermissionUtil.hasPermissionLevel(source, 3))
                                 .executes((ctx) -> {
                                     Entity entity = ctx.getSource().getEntity();
                                     if(!(entity instanceof LivingEntity lEntity)) {

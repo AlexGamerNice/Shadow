@@ -64,7 +64,7 @@ public class GetHeart extends Ability {
         EntityAttributeInstance attr = player
             .getAttributes()
             .getCustomInstance(
-                EntityAttributes.GENERIC_MAX_HEALTH
+                EntityAttributes.MAX_HEALTH
             );
 
         if (attr == null) {

@@ -22,13 +22,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtIntArray;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Uuids;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
@@ -267,7 +268,7 @@ public class AddHealthLink extends Ability {
             players.stream()
                 .map(
                     (p) ->
-                        NbtHelper.fromUuid(p.playerUUID)
+                        new NbtIntArray(Uuids.toIntArray(p.playerUUID))
                 ).forEach(list::add);
 
             nbt.put("players",list);
@@ -276,15 +277,13 @@ public class AddHealthLink extends Ability {
 
         public void readNBT(NbtCompound nbt) {
             this.players.clear();
-            this.health = nbt.getFloat("health");
+            this.health = nbt.getFloat("health", 1.0f);
 
-            NbtList players = nbt.getList(
-                "players",
-                NbtElement.INT_ARRAY_TYPE
-            );
+            NbtList players = nbt.getListOrEmpty("players");
 
             players.stream()
-                .map(NbtHelper::toUuid)
+                .filter(e -> e instanceof NbtIntArray)
+                .map(e -> Uuids.toUuid(((NbtIntArray) e).getIntArray()))
                 .map(shadow.indirectPlayerManager::get)
                 .forEach(this.players::add);
         }
@@ -348,7 +347,7 @@ public class AddHealthLink extends Ability {
                                 float newHealth = sPlayer.getMaxHealth() * this.health;
                                 setHealthNoLifeLink(sPlayer,newHealth);
                                 if (sPlayer.isDead()) {
-                                    if (!sPlayer.tryUseTotem(source)) {
+                                    if (!sPlayer.tryUseDeathProtector(source)) {
                                         sPlayer.onDeath(source);
                                     }
                                 }
@@ -377,7 +376,7 @@ public class AddHealthLink extends Ability {
         }
 
         public boolean update(@Nullable DamageSource source, float newHealth, float oldHealth, ServerPlayerEntity damageTarget) {
-            Shadow shadow = MiscUtil.getShadow(damageTarget.server);
+            Shadow shadow = MiscUtil.getShadow(damageTarget.getEntityWorld().getServer());
 
             IndirectPlayer p = shadow.getIndirect(damageTarget);
 

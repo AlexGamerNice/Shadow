@@ -28,9 +28,9 @@ public abstract class LivingEntityMixin extends Entity {
         // It incorrectly believe it can never be a ServerPlayerEntity
         //noinspection ConstantValue
         if(!((Object) this instanceof ServerPlayerEntity player)) return;
-        if(player.server == null) return;
+        if(player.getEntityWorld().getServer() == null) return;
 
-        Shadow shadow = getShadow(this.getServer());
+        Shadow shadow = getShadow(player.getEntityWorld().getServer());
         IndirectPlayer iP = shadow.getIndirect(player);
         if(iP.link != null) {
             if(iP.link.update(
@@ -54,7 +54,7 @@ public abstract class LivingEntityMixin extends Entity {
     )
     public void hookDamage(LivingEntity instance, float health, @Local(argsOnly = true)DamageSource source) {
         if((Object) instance instanceof ServerPlayerEntity player) {
-            Shadow shadow = getShadow(this.getServer());
+            Shadow shadow = getShadow(player.getEntityWorld().getServer());
             IndirectPlayer iP = shadow.getIndirect(player);
             if(iP.link != null) {
                 if(iP.link.update(

@@ -11,9 +11,8 @@ import com.maximumg9.shadow.util.TextUtil;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
@@ -23,10 +22,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.World;
+import net.minecraft.world.rule.GameRules;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -36,25 +33,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin extends PlayerEntity {
+public abstract class ServerPlayerEntityMixin {
     @org.spongepowered.asm.mixin.Shadow
     @Final
-    public MinecraftServer server;
-    
-    public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
-        super(world, pos, yaw, gameProfile);
-    }
-    
+    private MinecraftServer server;
+
     @SuppressWarnings("UnusedReturnValue")
     @org.spongepowered.asm.mixin.Shadow
     public abstract boolean changeGameMode(GameMode gameMode);
+
+    private ServerPlayerEntity self() {
+        return (ServerPlayerEntity) (Object) this;
+    }
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(MinecraftServer server, ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, CallbackInfo ci) {
         Shadow shadow = getShadow(this.server);
 
         IndirectPlayer p = shadow.getIndirect((ServerPlayerEntity) (Object) this);
-        if (p.role.getFaction() == Faction.SPECTATOR) server.getScoreboard().addScoreHolderToTeam(getNameForScoreboard(), shadow.playerTeam);
+        if (p.role.getFaction() == Faction.SPECTATOR) this.server.getScoreboard().addScoreHolderToTeam(self().getNameForScoreboard(), shadow.playerTeam);
         shadow.addTickable(Delay.instant(() -> p.role.onJoin()));
     }
 
@@ -64,7 +61,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
         ordinal = 0
     ))
     public void onPlayerKill(Entity entityKilled, int score, DamageSource damageSource, CallbackInfo ci) {
-        IndirectPlayer p = getShadow(server).getIndirect((ServerPlayerEntity) (Object) this);
+        IndirectPlayer p = getShadow(this.server).getIndirect((ServerPlayerEntity) (Object) this);
         p.role.onPlayerKill();
     }
 
@@ -73,18 +70,17 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
     public void modifyDeathMessage(DamageSource damageSource, CallbackInfo ci) {
         Shadow shadow = getShadow(this.server);
         
-        GameRules.BooleanRule showDeathMessage = this.getWorld().getGameRules().get(GameRules.SHOW_DEATH_MESSAGES);
         if (shadow.state.phase == GamePhase.PLAYING) {
-            showDeathMessage.set(false, this.server);
+            self().getEntityWorld().getServer().getOverworld().getGameRules().setValue(GameRules.SHOW_DEATH_MESSAGES, false, this.server);
             
-            MutableText name = Team.decorateName(this.getScoreboardTeam(), this.getName());
+            MutableText name = Team.decorateName(self().getScoreboardTeam(), self().getName());
             
             IndirectPlayer iPlayer = shadow.getIndirect((ServerPlayerEntity) (Object) this);
             
             Style factionStyle = iPlayer.role.getFaction().name.getStyle();
             
             // @TODO test this code with a working ability that applies the hide role flag
-            if (iPlayer.extraStorage.contains(ObfuscateRole.HIDE_ROLE_KEY, NbtElement.INT_TYPE)) {
+            if (iPlayer.extraStorage.contains(ObfuscateRole.HIDE_ROLE_KEY)) {
                 name
                     .setStyle(Style.EMPTY.withColor(Formatting.GRAY))
                     .append(Text.of(" died. They were a "))
@@ -95,7 +91,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
                 this.server.getPlayerManager().getPlayerList().forEach((player) -> {
                     if (
                         shadow.getIndirect(player).role.getFaction().ordinal() ==
-                            iPlayer.extraStorage.getInt(ObfuscateRole.HIDE_ROLE_KEY)
+                            iPlayer.extraStorage.getInt(ObfuscateRole.HIDE_ROLE_KEY, 0)
                             || shadow.getIndirect(player).role.getFaction() == Faction.SPECTATOR) {
                         player.sendMessage(
                             Text.literal("").
@@ -130,7 +126,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
                 shadow.broadcast(name);
             }
         } else {
-            showDeathMessage.set(true, this.server);
+            self().getEntityWorld().getServer().getOverworld().getGameRules().setValue(GameRules.SHOW_DEATH_MESSAGES, true, this.server);
         }
     }
     
@@ -146,7 +142,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
         
         shadow.checkWin(null);
 
-        AddHealthLink.Link.setHealthNoLifeLink(this, 0.0f);
+        AddHealthLink.Link.setHealthNoLifeLink((LivingEntity) (Object) this, 0.0f);
     }
     
     @Inject(method = "onSpawn", at = @At("TAIL"))

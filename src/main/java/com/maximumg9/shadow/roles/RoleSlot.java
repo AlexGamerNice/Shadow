@@ -63,18 +63,18 @@ public class RoleSlot implements ItemRepresentable, Saveable {
     }
     
     public void readNBT(NbtCompound nbt) {
-        int index = nbt.getInt("index");
+        int index = nbt.getInt("index", this.index);
         
         if (index != this.index)
             throw new IllegalStateException("Indexes in saved role slots do not match (maybe they weren't saved correctly?)");
-        NbtCompound weights = nbt.getCompound("weights");
+        NbtCompound weightCompound = nbt.getCompoundOrEmpty("weights");
         
-        weights.getKeys().stream()
+        weightCompound.getKeys().stream()
             .map(
                 (roleName) ->
                     new Pair<>(
                         Roles.getRole(roleName),
-                        weights.getInt(roleName)
+                        weightCompound.getInt(roleName, 0)
                     )
             ).forEach((weightPair) ->
                 this.weights[weightPair.getLeft().ordinal()] = weightPair.getRight()
