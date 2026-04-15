@@ -126,7 +126,13 @@ public abstract class PersistentProjectileMixin extends ProjectileEntity {
         return baseDamage;
     }
     
-    @ModifyArg(method = "onEntityHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/damage/DamageSource;F)Z"))
+    @ModifyArg(
+        method = "onEntityHit",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/entity/Entity;sidedDamage(Lnet/minecraft/entity/damage/DamageSource;F)Z"
+        )
+    )
     public DamageSource entityHit(DamageSource source) {
         Entity attacker = source.getAttacker();
         if (attacker == null) return source;
