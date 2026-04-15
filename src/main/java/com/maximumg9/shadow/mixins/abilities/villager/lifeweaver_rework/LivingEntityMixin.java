@@ -10,6 +10,7 @@ import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -26,7 +27,7 @@ import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 public abstract class LivingEntityMixin extends Entity {
 
     @org.spongepowered.asm.mixin.Shadow
-    public abstract boolean damage(DamageSource source, float amount);
+    public abstract boolean damage(ServerWorld world, DamageSource source, float amount);
 
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
@@ -39,7 +40,7 @@ public abstract class LivingEntityMixin extends Entity {
     ))
     public void deathPrevention(LivingEntity instance, DamageSource damageSource) {
         if (instance.isPlayer()) {
-            Shadow shadow = getShadow(instance.getServer());
+            Shadow shadow = getShadow(instance.getEntityWorld().getServer());
             IndirectPlayer indirect = shadow.getIndirect((ServerPlayerEntity) instance);
             Entity attacker = damageSource.getAttacker();
             IndirectPlayer indirectAttacker =
@@ -61,7 +62,7 @@ public abstract class LivingEntityMixin extends Entity {
                 instance.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 900, 1));
                 instance.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 100, 1));
                 instance.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 800, 0));
-                instance.getWorld().sendEntityStatus(this, EntityStatuses.USE_TOTEM_OF_UNDYING);
+                instance.getEntityWorld().sendEntityStatus(instance, EntityStatuses.USE_TOTEM_OF_UNDYING);
             } else {
                 instance.onDeath(damageSource);
             }

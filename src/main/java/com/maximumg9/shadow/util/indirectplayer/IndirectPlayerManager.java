@@ -52,10 +52,10 @@ public class IndirectPlayerManager implements Tickable, Saveable {
     }
 
     public void readNBT(NbtCompound nbt) {
-        NbtList list = nbt.getList("indirectPlayers", NbtElement.COMPOUND_TYPE);
+        NbtList list = nbt.getListOrEmpty("indirectPlayers");
         
         for (int i = 0; i < list.size(); i++) {
-            NbtCompound indirectPlayerData = list.getCompound(i);
+            NbtCompound indirectPlayerData = list.getCompoundOrEmpty(i);
             UUID uuid = IndirectPlayer.getUUIDForData(indirectPlayerData);
             IndirectPlayer existingPlayer = this.indirectPlayers.get(uuid);
             if(existingPlayer != null) {

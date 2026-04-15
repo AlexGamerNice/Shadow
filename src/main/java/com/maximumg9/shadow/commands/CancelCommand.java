@@ -13,7 +13,7 @@ public class CancelCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
             literal("$cancel")
-                .requires((source) -> source.hasPermissionLevel(3))
+                .requires((source) -> com.maximumg9.shadow.util.PermissionUtil.hasPermissionLevel(source, 3))
                 .executes((ctx) -> {
                     Shadow shadow = getShadow(ctx.getSource().getServer());
                     try {

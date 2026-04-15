@@ -16,6 +16,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructurePiece;
 import net.minecraft.structure.StructureSet;
@@ -37,7 +38,9 @@ import net.minecraft.world.gen.structure.StructureKeys;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -49,7 +52,7 @@ public class LocationCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
             literal("$location")
-                .requires((source) -> source.hasPermissionLevel(3))
+                .requires((source) -> com.maximumg9.shadow.util.PermissionUtil.hasPermissionLevel(source, 3))
                 .then(
                     literal("force")
                         .executes((ctx) -> {
@@ -192,8 +195,9 @@ public class LocationCommand {
         ServerWorld overworld = server.getOverworld();
         Shadow shadow = getShadow(server);
         
-        Optional<RegistryEntry.Reference<Structure>> strongholdStructure = overworld.getRegistryManager().get(RegistryKeys.STRUCTURE).getEntry(StructureKeys.STRONGHOLD);
-        
+        Optional<RegistryEntry.Reference<Structure>> strongholdStructure =
+            overworld.getRegistryManager().getOrThrow(RegistryKeys.STRUCTURE).getOptional(StructureKeys.STRONGHOLD);
+
         if (strongholdStructure.isEmpty()) {
             shadow.ERROR("Strongholds aren't generating (maybe you have a mod or datapack that modifies stronghold generation?)");
             return null;
@@ -201,7 +205,7 @@ public class LocationCommand {
         
         StructureSet strongholds = overworld
             .getRegistryManager()
-            .get(RegistryKeys.STRUCTURE_SET)
+            .getOrThrow(RegistryKeys.STRUCTURE_SET)
             .get(StructureSetKeys.STRONGHOLDS);
         
         if (strongholds == null) {
@@ -237,6 +241,8 @@ public class LocationCommand {
         FakeStructureWorldAccess fakeStructureWorldAccess = new FakeStructureWorldAccess(overworld);
         
         strongholdStructure.get().value().createStructureStart(
+            strongholdStructure.get(),
+            overworld.getRegistryKey(),
             overworld.getRegistryManager(),
             overworld.getChunkManager().getChunkGenerator(),
             overworld.getChunkManager().getChunkGenerator().getBiomeSource(),
@@ -287,7 +293,8 @@ public class LocationCommand {
             
             int y = 1 + WorldUtil.getTopYForBoundingBox(world, player.getBoundingBox(player.getPose()).offset(x, 0, z), Heightmap.Type.MOTION_BLOCKING);
             
-            player.teleport(world, x, y, z, currentAngle * 180 / MathHelper.PI, 0);
+            Set<PositionFlag> flags = EnumSet.noneOf(PositionFlag.class);
+            player.teleport(world, x, y, z, flags, currentAngle * 180 / MathHelper.PI, 0, false);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.maximumg9.shadow.abilities;
 
+import com.maximumg9.shadow.util.ItemComponents;
 import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.NBTUtil;
 import com.maximumg9.shadow.util.TextUtil;
@@ -15,8 +16,6 @@ import net.minecraft.potion.Potions;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Unit;
-
 public class ToggleStrength extends Ability {
     public static final Identifier ID = MiscUtil.shadowID("toggle_strength");
     private static final ItemStack ITEM_STACK;
@@ -41,8 +40,8 @@ public class ToggleStrength extends Ability {
             )
         );
         ITEM_STACK.set(
-            DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP,
-            Unit.INSTANCE
+            DataComponentTypes.TOOLTIP_DISPLAY,
+            ItemComponents.HIDE_ADDITIONAL_TOOLTIP
         );
         NBTUtil.removeAttributeModifiers(ITEM_STACK);
     }

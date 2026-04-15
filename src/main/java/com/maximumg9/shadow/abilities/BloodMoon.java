@@ -41,7 +41,7 @@ public class BloodMoon extends Ability {
     @Override
     public void onPlayerKill() {
         if (!getShadow().isNight()) return;
-        EntityAttributeInstance instance = player.getPlayerOrThrow().getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+        EntityAttributeInstance instance = player.getPlayerOrThrow().getAttributeInstance(EntityAttributes.MAX_HEALTH);
         if (instance == null) return;
 
         EntityAttributeModifier modifier = instance.getModifier(HP_ATTR_ID);
@@ -74,7 +74,7 @@ public class BloodMoon extends Ability {
         super.onDay();
         player.scheduleUntil(
             (p) -> {
-                EntityAttributeInstance instance = player.getPlayerOrThrow().getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+                EntityAttributeInstance instance = player.getPlayerOrThrow().getAttributeInstance(EntityAttributes.MAX_HEALTH);
                 if (instance == null) {
                     getShadow().ERROR("People are unhealthy (max health doesn't exist somehow lol) \"we're so cooked\" - osmii");
                     return;
@@ -104,7 +104,7 @@ public class BloodMoon extends Ability {
         super.onNight();
         player.scheduleUntil(
             (p) -> {
-                EntityAttributeInstance instance = p.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+                EntityAttributeInstance instance = p.getAttributeInstance(EntityAttributes.MAX_HEALTH);
                 if (instance == null) {
                     getShadow().ERROR("People are unhealthy (max health doesn't exist somehow lol) \"we're so cooked\" - osmii");
                     return;

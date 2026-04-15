@@ -21,7 +21,7 @@ public class SlotMixin {
     @Inject(method = "canInsert", at = @At("HEAD"), cancellable = true)
     public void canInsert(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if (this.inventory instanceof PlayerInventory) return;
-        if (!NBTUtil.getCustomData(stack).getBoolean(NBTUtil.RESTRICT_MOVEMENT_KEY)) return;
+        if (!NBTUtil.getCustomData(stack).getBoolean(NBTUtil.RESTRICT_MOVEMENT_KEY).orElse(false)) return;
         cir.setReturnValue(false);
         cir.cancel();
     }

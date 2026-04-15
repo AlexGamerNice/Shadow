@@ -153,7 +153,7 @@ public class LifeShield extends Ability {
                         EntityAttributeInstance attr = actor
                             .getAttributes()
                             .getCustomInstance(
-                                EntityAttributes.GENERIC_MAX_HEALTH
+                                EntityAttributes.MAX_HEALTH
                             );
 
                         if (attr == null) {

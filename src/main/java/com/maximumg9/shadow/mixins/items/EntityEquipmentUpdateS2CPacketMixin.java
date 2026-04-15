@@ -31,7 +31,7 @@ public class EntityEquipmentUpdateS2CPacketMixin {
                 pair.mapSecond(
                     item ->
                         NBTUtil.getCustomData(item)
-                            .getBoolean(NBTUtil.INVISIBLE_KEY) ? ItemStack.EMPTY : item
+                            .getBoolean(NBTUtil.INVISIBLE_KEY).orElse(false) ? ItemStack.EMPTY : item
                 )
         );
         

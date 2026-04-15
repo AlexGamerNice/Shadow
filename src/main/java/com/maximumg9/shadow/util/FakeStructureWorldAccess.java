@@ -9,7 +9,6 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.server.MinecraftServer;
@@ -26,6 +25,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.StructureWorldAccess;
+import net.minecraft.world.attribute.EnvironmentAttributeAccess;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
@@ -111,18 +111,15 @@ public class FakeStructureWorldAccess implements StructureWorldAccess {
     }
     
     @Override
-    public void playSound(@Nullable PlayerEntity source, BlockPos pos, SoundEvent sound, SoundCategory category, float volume, float pitch) {
-    
+    public void playSound(@Nullable Entity source, BlockPos pos, SoundEvent sound, SoundCategory category, float volume, float pitch) {
     }
-    
+
     @Override
-    public void addParticle(ParticleEffect parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
-    
+    public void addParticleClient(ParticleEffect parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
     }
-    
+
     @Override
-    public void syncWorldEvent(@Nullable PlayerEntity player, int eventId, BlockPos pos, int data) {
-    
+    public void syncWorldEvent(@Nullable Entity entity, int eventId, BlockPos pos, int data) {
     }
     
     @Override
@@ -138,6 +135,11 @@ public class FakeStructureWorldAccess implements StructureWorldAccess {
     @Override
     public LightingProvider getLightingProvider() {
         return this.backing.getLightingProvider();
+    }
+
+    @Override
+    public EnvironmentAttributeAccess getEnvironmentAttributes() {
+        return this.backing.getEnvironmentAttributes();
     }
     
     @Override
@@ -206,7 +208,7 @@ public class FakeStructureWorldAccess implements StructureWorldAccess {
     public Chunk getChunk(int chunkX, int chunkZ, ChunkStatus leastStatus, boolean create) {
         Chunk chunk = this.backing.getChunk(chunkX, chunkZ, leastStatus, create);
         if (chunk == null) return null;
-        return new FakeChunk(chunk, this.backing.getRegistryManager().get(RegistryKeys.BIOME));
+        return new FakeChunk(chunk);
     }
     
     @Override

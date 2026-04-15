@@ -1,5 +1,6 @@
 package com.maximumg9.shadow.modifiers;
 
+import com.maximumg9.shadow.util.ItemComponents;
 import com.maximumg9.shadow.util.NBTUtil;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
@@ -10,7 +11,6 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Unit;
 import org.jetbrains.annotations.Nullable;
 
 public class ShadowTheHedgehog extends Modifier {
@@ -22,8 +22,8 @@ public class ShadowTheHedgehog extends Modifier {
     static {
         ITEM_STACK.set(DataComponentTypes.ITEM_NAME, new ShadowTheHedgehog(null).getName());
         ITEM_STACK.set(
-            DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP,
-            Unit.INSTANCE
+            DataComponentTypes.TOOLTIP_DISPLAY,
+            ItemComponents.HIDE_ADDITIONAL_TOOLTIP
         );
         NBTUtil.removeAttributeModifiers(ITEM_STACK);
     }

@@ -6,11 +6,14 @@ import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Uuids;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 public abstract class NBTUtil {
@@ -52,7 +55,7 @@ public abstract class NBTUtil {
         return Objects.equals(getID(stack), id);
     }
     public static @Nullable Identifier getID(@NotNull ItemStack stack) {
-        String id = getCustomData(stack).getString(ID_NAME);
+        String id = getCustomData(stack).getString(ID_NAME, "");
         return id.isEmpty() ? null : Identifier.tryParse(id);
     }
     public static ItemStack addID(@NotNull ItemStack stack, Identifier id) {
@@ -65,8 +68,20 @@ public abstract class NBTUtil {
     public static ItemStack removeAttributeModifiers(ItemStack stack) {
         stack.set(
             DataComponentTypes.ATTRIBUTE_MODIFIERS,
-            new AttributeModifiersComponent(List.of(), true)
+            new AttributeModifiersComponent(List.of())
         );
         return stack;
+    }
+
+    public static void putUuid(NbtCompound compound, String key, UUID uuid) {
+        compound.putIntArray(key, Uuids.toIntArray(uuid));
+    }
+
+    public static Optional<UUID> getUuid(NbtCompound compound, String key) {
+        return compound.getIntArray(key).map(Uuids::toUuid);
+    }
+
+    public static boolean containsUuid(NbtCompound compound, String key) {
+        return compound.getIntArray(key).isPresent();
     }
 }

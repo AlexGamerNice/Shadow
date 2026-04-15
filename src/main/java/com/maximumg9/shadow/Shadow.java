@@ -7,10 +7,12 @@ import com.maximumg9.shadow.config.Config;
 import com.maximumg9.shadow.items.AbilityStar;
 import com.maximumg9.shadow.items.Eye;
 import com.maximumg9.shadow.items.ItemUseCallback;
+import com.maximumg9.shadow.items.LifeweaverHeart;
 import com.maximumg9.shadow.items.ParticipationEye;
 import com.maximumg9.shadow.roles.Faction;
 import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.util.LinkRegistry;
+import com.maximumg9.shadow.util.PermissionUtil;
 import com.maximumg9.shadow.util.TextUtil;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
@@ -216,7 +218,7 @@ public class Shadow implements Tickable {
             this.getOnlinePlayers().stream()
                 .filter(player ->
                     player.role.getFaction() == Faction.SPECTATOR &&
-                    player.getPlayerOrThrow().hasPermissionLevel(3)
+                    PermissionUtil.hasPermissionLevel(player.getPlayerOrThrow(), 3)
                 )
                 .forEach(
                     (player) -> player.sendMessageNow(messageAsText)
@@ -455,7 +457,7 @@ public class Shadow implements Tickable {
         IndirectPlayerManager playerManagerCopy = new IndirectPlayerManager(this.indirectPlayerManager);
         Config configCopy = this.config.copy(this);
         
-        Util.getIoWorkerExecutor().submit(
+        Util.getIoWorkerExecutor().execute(
             () -> {
                 try {
                     save(stateCopy, playerManagerCopy, configCopy);

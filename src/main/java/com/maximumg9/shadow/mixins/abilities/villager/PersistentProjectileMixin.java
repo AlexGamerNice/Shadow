@@ -16,7 +16,6 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -44,8 +43,9 @@ public abstract class PersistentProjectileMixin extends ProjectileEntity {
             return EnchantmentHelper.getDamage(world, stack, target, damageSource, baseDamage);
         
         if (NBTUtil.hasID(stack, SheriffBow.ID)) {
-            UUID ownerUUID = NBTUtil.getCustomData(stack).getUuid("owner");
-            Shadow shadow = getShadow(player.getServer());
+            UUID ownerUUID = NBTUtil.getUuid(NBTUtil.getCustomData(stack), "owner").orElse(null);
+            if (ownerUUID == null) return EnchantmentHelper.getDamage(world, stack, target, damageSource, baseDamage);
+            Shadow shadow = getShadow(player.getEntityWorld().getServer());
             IndirectPlayer owner = shadow.indirectPlayerManager.get(ownerUUID);
             IndirectPlayer iPlayer = shadow.getIndirect(player);
             
@@ -53,25 +53,26 @@ public abstract class PersistentProjectileMixin extends ProjectileEntity {
                 Role targetRole = shadow.getIndirect(pTarget).role;
                 if (targetRole.getFaction() == owner.role.getFaction()) {
                     owner.scheduleUntil(
-                        LivingEntity::kill,
+                        (pl) -> pl.kill(player.getEntityWorld()),
                         CancelPredicates.cancelOnPhaseChange(shadow.state.phase)
                     );
                     iPlayer.scheduleUntil(
-                        LivingEntity::kill,
+                        (pl) -> pl.kill(player.getEntityWorld()),
                         CancelPredicates.cancelOnPhaseChange(shadow.state.phase)
                     );
                 }
-                pTarget.disableShield();
+                if (pTarget.getEntityWorld() instanceof ServerWorld serverWorld) {
+                    pTarget.takeShieldHit(serverWorld, player);
+                }
             }
             
             // Bow removal, if no bow in inventory, then no damage :)
             int val = player.getInventory().remove(
                 (item) ->
-                    NBTUtil.getCustomData(item)
-                        .containsUuid("owner") &&
-                        NBTUtil.getCustomData(item)
-                            .getUuid("owner")
-                            .equals(ownerUUID),
+                    NBTUtil.containsUuid(NBTUtil.getCustomData(item), "owner") &&
+                        NBTUtil.getUuid(NBTUtil.getCustomData(item), "owner")
+                            .filter(ownerUUID::equals)
+                            .isPresent(),
                 1,
                 player.playerScreenHandler.getCraftingInput()
             );
@@ -112,9 +113,8 @@ public abstract class PersistentProjectileMixin extends ProjectileEntity {
                 }
             }
 
-            player.playSoundToPlayer(
+            player.playSound(
                 SoundEvent.of(Identifier.of("minecraft", "entity.item.break")),
-                SoundCategory.PLAYERS,
                 1.0f,
                 1.0f
             );
@@ -126,14 +126,14 @@ public abstract class PersistentProjectileMixin extends ProjectileEntity {
         return baseDamage;
     }
     
-    @ModifyArg(method = "onEntityHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"))
+    @ModifyArg(method = "onEntityHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/damage/DamageSource;F)Z"))
     public DamageSource entityHit(DamageSource source) {
         Entity attacker = source.getAttacker();
         if (attacker == null) return source;
         if (!(attacker instanceof ServerPlayerEntity player)) return source;
         ItemStack weaponStack = source.getWeaponStack();
         if (weaponStack == null) return source;
-        if (!NBTUtil.getCustomData(weaponStack).containsUuid("owner")) return source;
+        if (!NBTUtil.containsUuid(NBTUtil.getCustomData(weaponStack), "owner")) return source;
         if (
             !player.getInventory().containsAny(
                 (stack) -> NBTUtil.hasID(stack, SheriffBow.ID)

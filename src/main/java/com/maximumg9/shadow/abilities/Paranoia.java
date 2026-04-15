@@ -1,6 +1,6 @@
 package com.maximumg9.shadow.abilities;
 
-import com.maximumg9.shadow.LifeweaverHeart;
+import com.maximumg9.shadow.items.LifeweaverHeart;
 import com.maximumg9.shadow.util.*;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
@@ -151,7 +151,7 @@ public class Paranoia extends Ability {
 
         Optional<ServerPlayerEntity> possiblePlayer = this.player.getPlayer();
         possiblePlayer.ifPresent( p ->
-            p.getServerWorld().getPlayers(
+            p.getEntityWorld().getPlayers(
                 (player) -> {
                     IndirectPlayer indirect = getShadow().getIndirect(player);
                     return player.squaredDistanceTo(p) <= this.player.getShadow().config.fearRadius * this.player.getShadow().config.fearRadius

@@ -10,7 +10,6 @@ import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.screens.ModifierSlotScreenHandler;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -31,11 +30,11 @@ public class ModifierManager implements Saveable {
     }
     
     public void readNBT(NbtCompound nbt) {
-        NbtList list = nbt.getList("modifierSlots", NbtElement.COMPOUND_TYPE);
+        NbtList list = nbt.getListOrEmpty("modifierSlots");
         
         for (int i = 0; i < list.size(); i++) {
             if (modifierSlots.size() <= i) modifierSlots.add(new ModifierSlot(i));
-            this.modifierSlots.get(i).readNBT(list.getCompound(i));
+            this.modifierSlots.get(i).readNBT(list.getCompoundOrEmpty(i));
         }
     }
     

@@ -9,7 +9,6 @@ import com.maximumg9.shadow.screens.DecisionScreenHandler;
 import com.maximumg9.shadow.screens.RoleSlotScreenHandler;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -35,12 +34,12 @@ public class RoleManager implements Saveable {
     }
     
     public void readNBT(NbtCompound nbt) {
-        NbtList list = nbt.getList("roleSlots", NbtElement.COMPOUND_TYPE);
+        NbtList list = nbt.getListOrEmpty("roleSlots");
         
         int length = Math.min(list.size(), roleSlots.length);
         
         for (int i = 0; i < length; i++) {
-            this.roleSlots[i].readNBT(list.getCompound(i));
+            this.roleSlots[i].readNBT(list.getCompoundOrEmpty(i));
         }
         for (int i = length; i < roleSlots.length; i++) {
             this.roleSlots[i].reset();

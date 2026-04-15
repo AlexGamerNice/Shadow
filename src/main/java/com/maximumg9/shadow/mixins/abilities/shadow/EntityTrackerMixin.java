@@ -31,7 +31,7 @@ public class EntityTrackerMixin {
         if(!(this.entity instanceof TridentEntity trident)) return;
         if(!PoseidonsTrident.ID.equals(NBTUtil.getID(trident.getItemStack()))) return;
 
-        Shadow shadow = getShadow(this.entity.getServer());
+        Shadow shadow = getShadow(this.entity.getEntityWorld().getServer());
         IndirectPlayer iPlayer = shadow.getIndirect(player);
 
         if(iPlayer.role.getFaction() != Faction.SHADOW) {

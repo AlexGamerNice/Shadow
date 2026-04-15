@@ -11,9 +11,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -24,7 +24,7 @@ public class ParticipationEye implements ItemUseCallback {
     public static final Identifier ID = MiscUtil.shadowID("participation_eye");
     
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    public ActionResult use(World world, PlayerEntity user, Hand hand) {
         if (!(world instanceof ServerWorld)) return null;
         
         ItemStack item = user.getStackInHand(hand);
@@ -37,7 +37,7 @@ public class ParticipationEye implements ItemUseCallback {
             .getIndirect((ServerPlayerEntity) user)
             .participating = newData.participating;
         
-        return TypedActionResult.success(item);
+        return ActionResult.SUCCESS;
     }
     
     public record EnderEyeData(boolean participating) implements ItemData {
@@ -48,7 +48,7 @@ public class ParticipationEye implements ItemUseCallback {
         public static EnderEyeData read(ItemStack stack) {
             NbtCompound customData = NBTUtil.getCustomData(stack);
             
-            boolean participating = customData.getBoolean("participating");
+            boolean participating = customData.getBoolean("participating", false);
             
             return new EnderEyeData(participating);
         }

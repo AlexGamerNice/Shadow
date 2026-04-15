@@ -101,7 +101,7 @@ public class RoleGuess extends Ability {
                                     pl.sendMessage(TextUtil.green("You successfully guessed your target's role."));
 
                                     target.damage(
-                                        pl.getServerWorld()
+                                        pl.getEntityWorld()
                                             .getDamageSources()
                                             .magic(),
                                         Float.MAX_VALUE,
@@ -113,7 +113,7 @@ public class RoleGuess extends Ability {
                                     pl.sendMessage(TextUtil.red("You guessed your target's role incorrectly!"));
 
                                     this.player.damage(
-                                        pl.getServerWorld()
+                                        pl.getEntityWorld()
                                             .getDamageSources()
                                             .magic(),
                                         Float.MAX_VALUE,

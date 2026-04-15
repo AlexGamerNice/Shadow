@@ -9,7 +9,7 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.SaveLoader;
-import net.minecraft.server.WorldGenerationProgressListenerFactory;
+import net.minecraft.world.chunk.ChunkLoadProgress;
 import net.minecraft.util.ApiServices;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.level.storage.LevelStorage;
@@ -36,7 +36,7 @@ public abstract class MinecraftServerMixin implements ShadowProvider {
     }
     
     @Inject(method = "<init>", at = @At("CTOR_HEAD"))
-    public void init(Thread serverThread, LevelStorage.Session session, ResourcePackManager dataPackManager, SaveLoader saveLoader, Proxy proxy, DataFixer dataFixer, ApiServices apiServices, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory, CallbackInfo ci) {
+    public void init(Thread serverThread, LevelStorage.Session session, ResourcePackManager dataPackManager, SaveLoader saveLoader, Proxy proxy, DataFixer dataFixer, ApiServices apiServices, ChunkLoadProgress chunkLoadProgress, CallbackInfo ci) {
         this.shadow = new Shadow((MinecraftServer) (Object) this);
         this.shadow.startup();
     }

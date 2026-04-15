@@ -1,6 +1,7 @@
 package com.maximumg9.shadow.abilities;
 
 import com.maximumg9.shadow.util.Delay;
+import com.maximumg9.shadow.util.ItemComponents;
 import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.NBTUtil;
 import com.maximumg9.shadow.util.TextUtil;
@@ -15,8 +16,6 @@ import net.minecraft.item.Items;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Unit;
-
 import java.util.stream.Stream;
 
 public class SunCurse extends ToggleStrength {
@@ -37,8 +36,8 @@ public class SunCurse extends ToggleStrength {
             TextUtil.withColour("Sun's Curse", Formatting.DARK_RED)
         );
         ITEM_STACK_DAY.set(
-            DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP,
-            Unit.INSTANCE
+            DataComponentTypes.TOOLTIP_DISPLAY,
+            ItemComponents.HIDE_ADDITIONAL_TOOLTIP
         );
         NBTUtil.removeAttributeModifiers(ITEM_STACK_DAY);
 
@@ -61,8 +60,8 @@ public class SunCurse extends ToggleStrength {
             )
         );
         ITEM_STACK_NIGHT.set(
-            DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP,
-            Unit.INSTANCE
+            DataComponentTypes.TOOLTIP_DISPLAY,
+            ItemComponents.HIDE_ADDITIONAL_TOOLTIP
         );
         NBTUtil.removeAttributeModifiers(ITEM_STACK_NIGHT);
     }

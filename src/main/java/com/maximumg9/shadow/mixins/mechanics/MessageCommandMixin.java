@@ -3,6 +3,7 @@ package com.maximumg9.shadow.mixins.mechanics;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.roles.Faction;
+import com.maximumg9.shadow.util.PermissionUtil;
 import com.maximumg9.shadow.util.TextUtil;
 import com.maximumg9.shadow.util.TimeUtil;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
@@ -33,7 +34,7 @@ public class MessageCommandMixin {
         if (shadow.config.disableChat) ci.cancel();
         
         IndirectPlayer player = shadow.getIndirect(p);
-        if (player.role.getFaction() == Faction.SPECTATOR && !p.hasPermissionLevel(3)) {
+        if (player.role.getFaction() == Faction.SPECTATOR && !PermissionUtil.hasPermissionLevel(p, 3)) {
             player.sendMessageNow(
                 TextUtil.withColour(
                     "You are a spectator so you cannot message",

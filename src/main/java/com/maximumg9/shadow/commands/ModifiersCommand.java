@@ -20,7 +20,7 @@ public class ModifiersCommand {
                     if (!src.isExecutedByPlayer()) { return -1; }
                     
                     Shadow shadow = getShadow(src.getServer());
-                    shadow.config.modifierManager.showModifierListIndex(Objects.requireNonNull(src.getPlayer()), src.hasPermissionLevel(3));
+                    shadow.config.modifierManager.showModifierListIndex(Objects.requireNonNull(src.getPlayer()), com.maximumg9.shadow.util.PermissionUtil.hasPermissionLevel(src, 3));
                     
                     ctx.getSource().sendFeedback(
                         () -> Text.literal("Opened Modifier Menu"),

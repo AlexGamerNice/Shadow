@@ -11,9 +11,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
@@ -23,18 +23,18 @@ public class LifeweaverHeart implements ItemUseCallback {
     public static final Identifier ID = MiscUtil.shadowID("lifeweaver_heart");
     
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    public ActionResult use(World world, PlayerEntity user, Hand hand) {
         if (!(world instanceof ServerWorld)) return null;
         
         ItemStack stack = user.getStackInHand(hand);
         
         NbtCompound nbt = NBTUtil.getCustomData(stack);
         
-        if (!nbt.contains(HEALTH_INCREASE_KEY, NbtElement.DOUBLE_TYPE)) {
+        if (nbt.getDouble(HEALTH_INCREASE_KEY).isEmpty()) {
             return null;
         } else {
-            double healthIncrease = nbt.getDouble(HEALTH_INCREASE_KEY);
-            EntityAttributeInstance instance = user.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+            double healthIncrease = nbt.getDouble(HEALTH_INCREASE_KEY, 0.0);
+            EntityAttributeInstance instance = user.getAttributeInstance(EntityAttributes.MAX_HEALTH);
             
             if (instance == null) {
                 return null;
@@ -64,7 +64,7 @@ public class LifeweaverHeart implements ItemUseCallback {
                 );
             }
             stack.decrement(1);
-            return TypedActionResult.consume(stack);
+            return ActionResult.CONSUME.withNewHandStack(stack);
         }
     }
 }
